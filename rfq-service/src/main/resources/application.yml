@@ -1,0 +1,33 @@
+# ==============================================================================
+# RFQ Service Configuration (Step 1)
+# ==============================================================================
+
+server:
+  # Microservice HTTP listener port
+  port: 8081
+
+spring:
+  application:
+    # Service ID used for Service Discovery (Eureka in Step 4) and Distributed Tracing (Step 12)
+    name: rfq-service
+
+# ==============================================================================
+# Spring Boot Actuator Configuration (Health & Observability)
+# ==============================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expose health and info endpoints via HTTP for container liveness/readiness probes
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+# Application metadata returned by /actuator/info
+info:
+  app:
+    name: "@project.name@"
+    description: "@project.description@"
+    version: "@project.version@"
+    step: "1 - Hello RFQ with REST and Protobuf"

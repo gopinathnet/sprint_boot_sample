@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package com.trading.rfq.proto;
+
+// Generate multiple separate Java class files for cleaner code organization
+option java_multiple_files = true;
+// Target Java package for the generated Protobuf classes
+option java_package = "com.trading.rfq.proto";
+// Outer class name if accessed statically
+option java_outer_classname = "RfqProto";
+
+// Trade Side enumeration: indicates whether the RFQ is a BUY or a SELL order
+enum Side {
+  SIDE_UNSPECIFIED = 0; // Protobuf enum default must always be 0
+  BUY = 1;
+  SELL = 2;
+}
+
+// RFQ Lifecycle Status enumeration
+enum RfqStatus {
+  STATUS_UNSPECIFIED = 0;
+  PENDING = 1;  // Newly submitted RFQ awaiting pricing
+  QUOTED = 2;   // Pricing service provided a quote price
+  DEALT = 3;    // Client accepted the quote and executed the trade
+  EXPIRED = 4;  // Quote validity window lapsed without deal
+  REJECTED = 5; // Risk check or dealer rejected the RFQ
+}
+
+// Request payload to submit a new RFQ
+message CreateRfqRequest {
+  string client_id = 1;       // Unique identifier of the trading counterparty
+  string instrument_id = 2;   // Financial symbol (e.g. "EUR/USD", "AAPL", "US10Y")
+  Side side = 3;              // BUY or SELL
+  double quantity = 4;        // Trade notional quantity (e.g. 1000000.0)
+  string currency = 5;        // Base currency (e.g. "USD", "EUR")
+}
+
+// Response payload representing an RFQ record
+message RfqResponse {
+  string id = 1;              // Unique RFQ identifier (e.g. "RFQ-1001")
+  string client_id = 2;       // Client identifier
+  string instrument_id = 3;   // Instrument symbol
+  Side side = 4;              // BUY or SELL
+  double quantity = 5;        // Order quantity
+  string currency = 6;        // Currency
+  RfqStatus status = 7;       // Current status in the lifecycle
+  double price = 8;           // Quoted price (0.0 if not yet quoted)
+  int64 created_at = 9;       // Epoch timestamp in milliseconds
+  int64 expires_at = 10;      // Epoch timestamp in milliseconds when quote expires
+}
+
+// Collection wrapper for returning lists of RFQs
+message RfqListResponse {
+  repeated RfqResponse rfqs = 1;
+}
